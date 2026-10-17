@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+    <h1>Operaciones básicas</h1>
+
+    <form action="/operasbas" method="post">
+        <div class="mb-3">
+            <label for="n1" class="form-label">Número 1:</label>
+            <input type="number" step="any" class="form-control" id="n1" name="n1" value="{{ n1 }}">
+        </div>
+        <div class="mb-3">
+            <label for="n2" class="form-label">Número 2:</label>
+            <input type="number" step="any" class="form-control" id="n2" name="n2" value="{{ n2 }}">
+        </div>
+        
+        <label class="form-label">Seleccione la operación:</label>
+        
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="operacion" value="sumar" {% if operacion == 'sumar' %}checked{% endif %}>
+            <label class="form-check-label">Sumar</label>
+        </div>
+        
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="operacion" value="restar" {% if operacion == 'restar' %}checked{% endif %}>
+            <label class="form-check-label">Restar</label>
+        </div>
+        
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="operacion" value="multiplicar" {% if operacion == 'multiplicar' %}checked{% endif %}>
+            <label class="form-check-label">Multiplicar</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-3">Calcular</button>
+    </form>
+
+    <h1 class="mt-4">
+        El resultado es: {{ "%.2f"|format(res) }}
+    </h1>
+
+{% endblock %}

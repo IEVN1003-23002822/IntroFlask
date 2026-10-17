@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+<div class="container mt-4">
+    <h3>Cálculo de Distancia entre dos Puntos</h3>
+    
+    <form action="/distancia" method="POST">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h4>Punto 1 (X1, Y1)</h4>
+                <div class="mb-3">
+                    <label for="x1" class="form-label">Coordenada X1:</label>
+                    <input type="number" step="any" class="form-control" id="x1" name="x1" value="{{ x1 }}" placeholder="Ingrese X1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="y1" class="form-label">Coordenada Y1:</label>
+                    <input type="number" step="any" class="form-control" id="y1" name="y1" value="{{ y1 }}" placeholder="Ingrese Y1" required>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <h4>Punto 2 (X2, Y2)</h4>
+                <div class="mb-3">
+                    <label for="x2" class="form-label">Coordenada X2:</label>
+                    <input type="number" step="any" class="form-control" id="x2" name="x2" value="{{ x2 }}" placeholder="Ingrese X2" required>
+                </div>
+                <div class="mb-3">
+                    <label for="y2" class="form-label">Coordenada Y2:</label>
+                    <input type="number" step="any" class="form-control" id="y2" name="y2" value="{{ y2 }}" placeholder="Ingrese Y2" required>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Calcular Distancia</button>
+    </form>
+
+    <h3 class="mt-4">
+        Distancia: {{ "%.2f"|format(res) }}
+    </h3>
+</div>
+
+{% endblock %}
