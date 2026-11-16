@@ -7,10 +7,6 @@ alumnos_bp = Blueprint(
     url_prefix='/api/alumnos'
 )
 
-def fila_a_diccionario(cursor, fila):
-    columnas = [columna[0] for columna in cursor.descripcion]
-    return dict(zip(columnas, fila))
-    
 @alumnos_bp.route("/", methods=['GET'])
 def lista_alumnos():
     try:
@@ -20,57 +16,46 @@ def lista_alumnos():
         datos = cursor.fetchall()
         alumnos = []
         for fila in datos:
-            alumno = {"matricula": fila[0], "nombre": fila[1], "apaterno": fila[2], "amaterno": fila[3], "correo": fila[4]}
+            alumno = {
+                "matricula": fila[0], 
+                "nombre": fila[1], 
+                "apaterno": fila[2], 
+                "amaterno": fila[3], 
+                "correo": fila[4]
+            }
             alumnos.append(alumno)
         return jsonify({'alumnos': alumnos, 'mensaje': "lista de alumnos", 'exito': True})
     except Exception as ex:
-        return jsonify({'mensaje': "Error", 'exito': False})
-
-def leer_alumnos_bd(matricula):
-    cursor = None
-    try:
-        cursor = mysql.connection.cursor()
-        cursor.execute("select * FROM alumnos WHERE matricula = %s", (matricula,))
-        fila = cursor.fetchone()
-        if fila is None:
-            return jsonify({
-                'mensaje': 'Alumnos no encontrados',
-                'exito': False
-            }), 404
-        alumno = fila_a_diccionario(cursor, fila)
-        return jsonify({
-            'alumno': alumno,
-            'exito': True
-        }), 200
-    except Exception as ex:
-        return jsonify({
-            'mensaje': 'Error al consultar el alumno',
-            'exito': False
-        }), 500
-    finally:
-        if cursor is not None:
-            cursor.close()
+        return jsonify({'mensaje': f"Error al listar alumnos: {str(ex)}", 'exito': False}), 500
 
 @alumnos_bp.route("/<string:matricula>", methods=['GET'])
-def leer_alumnos(matricula):
+def leer_alumno(matricula):
     cursor = None
     try:
         cursor = mysql.connection.cursor()
-        cursor.execute("""SELECT * FROM alumnos WHERE matricula = %s""", (matricula,))
+        cursor.execute("SELECT * FROM alumnos WHERE matricula = %s", (matricula,))
         fila = cursor.fetchone()
         if fila is None:
             return jsonify({
                 'mensaje': 'Alumno no encontrado',
                 'exito': False
             }), 404
-        alumno = fila_a_diccionario(cursor, fila)
+        
+        alumno = {
+            "matricula": fila[0],
+            "nombre": fila[1],
+            "apaterno": fila[2],
+            "amaterno": fila[3],
+            "correo": fila[4]
+        }
+        
         return jsonify({
             'alumno': alumno,
             'exito': True
         }), 200
     except Exception as ex:
         return jsonify({
-            'mensaje': 'Error al consultar alumno {}'.format(ex),
+            'mensaje': f'Error al consultar el alumno: {str(ex)}',
             'exito': False
         }), 500
     finally:
@@ -102,16 +87,6 @@ def registrar_alumno():
     cursor = None
     try:
         cursor = mysql.connection.cursor()
-        cursor.execute(
-            "SELECT matricula FROM alumnos WHERE matricula = %s",
-            (datos['matricula'].strip(),)
-        )
-        if cursor.fetchone() is not None:
-            return jsonify({
-                'mensaje': 'La matricula ya existe',
-                'exito': False
-            }), 400
-            
         cursor.execute("""
             INSERT INTO alumnos
                 (matricula, nombre, apaterno, amaterno, correo)
@@ -127,9 +102,8 @@ def registrar_alumno():
 
     except Exception as ex:
         mysql.connection.rollback()
-
         return jsonify({
-            'mensaje': 'Error al registrar el alumno',
+            'mensaje': f'Error al registrar el alumno: {str(ex)}',
             'exito': False
         }), 500
 
@@ -146,7 +120,7 @@ def modificar_alumno(matricula):
         alumno = cursor.fetchone()
         if not alumno:
             return jsonify({
-                "mensaje": "No existe un alumnos con esa matricula"
+                "mensaje": "No existe un alumno con esa matricula"
             }), 404
 
         datos = request.get_json()
@@ -178,9 +152,8 @@ def modificar_alumno(matricula):
 
     except Exception as e:
         mysql.connection.rollback()
-
         return jsonify({
-            "mensaje": "Error al modificar el alumno",
+            "mensaje": f"Error al modificar el alumno: {str(e)}",
             "error": str(e)
         }), 500
 
@@ -218,7 +191,7 @@ def eliminar_alumno(matricula):
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({
-            "mensaje": "Error al eliminar el alumno",
+            "mensaje": f"Error al eliminar el alumno: {str(e)}",
             "error": str(e)
         }), 500
 
